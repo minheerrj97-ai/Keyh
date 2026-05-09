@@ -3,115 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống 1000 Key Cố Định</title>
+    <title>HỆ THỐNG PHÂN PHỐI KEY TOOL</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; }
-        h2 { color: #1a73e8; margin-bottom: 15px; }
-        p { color: #5f6368; font-size: 16px; margin: 8px 0; }
-        .bold { font-weight: bold; color: #202124; }
-        .key-box { margin-top: 20px; padding: 15px; background: #e8f0fe; border: 2px solid #1a73e8; border-radius: 8px; font-size: 24px; font-weight: bold; color: #1967d2; letter-spacing: 1px; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h2 { margin-bottom: 20px; font-size: 22px; color: #00ffcc; }
+        .key-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            word-break: break-all;
+            border: 1px dashed #00ffcc;
+            color: #ffff00;
+        }
+        button {
+            background: linear-gradient(to right, #00ffcc, #00a8cc);
+            border: none;
+            color: #0f2027;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Xác Thực Hệ Thống</h2>
-    <p>IP của bạn: <span id="user-ip" class="bold">Đang quét...</span></p>
-    <p>Key kích hoạt duy nhất:</p>
-    <div id="user-key" class="key-box">Đang đồng bộ...</div>
+<div class="container">
+    <h2>🔑 NHẬN KEY TOOL NGẪU NHIÊN 🔑</h2>
+    <p>Vui lòng sao chép mã bên dưới và gửi vào Bot Telegram để kích hoạt</p>
+    
+    <div class="key-box" id="keyText">ĐANG TẢI KEY...</div>
+    
+    <button id="btnCopy" onclick="copyKey()" disabled>📋 SAO CHÉP KEY</button>
 </div>
 
 <script>
-(() => {
-    // Hàm tự động tạo danh sách 1000 key riêng biệt, bảo mật (Format: KEY-XXXX-MÃ_HÓA)
-    function generateMasterKeyList() {
-        const list = [];
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Loại bỏ O, 0, I, 1 để tránh nhầm lẫn
+// Đường dẫn đến file key.txt của bạn trên GitHub Pages
+const TXT_URL = "key.txt"; 
+
+async function loadRandomKey() {
+    try {
+        // Kiểm tra xem trình duyệt đã lưu key phiên này chưa để tránh đổi key khi F5
+        let sessionKey = sessionStorage.getItem("user_key");
         
-        for (let i = 1; i <= 1000; i++) {
-            // Tạo chuỗi 6 ký tự ngẫu nhiên cố định dựa trên số thứ tự i để tạo độ phức tạp
-            let pseudoRandomStr = "";
-            let num = i * 1234567;
-            for (let j = 0; j < 6; j++) {
-                num = (num * 1103515245 + 12345) & 0x7fffffff;
-                pseudoRandomStr += chars[num % chars.length];
-            }
-            
-            const keyNumber = String(i).padStart(4, '0');
-            list.push(`KEY-${keyNumber}-${pseudoRandomStr}`);
-        }
-        return list;
-    }
-
-    // Khởi tạo danh sách 1000 key cố định ngay khi chạy trang
-    const MASTER_KEYS = generateMasterKeyList();
-
-    // Hàm lấy IP công khai của người dùng
-    async function getPublicIp() {
-        try {
-            const res = await fetch('ipify.org');
-            const data = await res.json();
-            return data.ip;
-        } catch {
-            try {
-                const resBackup = await fetch('ipinfo.io');
-                const dataBackup = await resBackup.json();
-                return dataBackup.ip;
-            } catch {
-                return null;
-            }
-        }
-    }
-
-    // Hàm chuyển đổi IP thành số nguyên cố định từ 0 đến 999
-    function ipToIndex(ip) {
-        let hash = 0;
-        // Chuỗi mã muối giúp phân bổ đều các dải IP
-        const salt = "SECURE_SYSTEM_2026"; 
-        const targetStr = ip + salt;
-        
-        for (let i = 0; i < targetStr.length; i++) {
-            hash = (hash << 5) - hash + targetStr.charCodeAt(i);
-            hash |= 0;
-        }
-        return Math.abs(hash) % 1000;
-    }
-
-    // Hàm chạy chính
-    async function main() {
-        const ipContainer = document.getElementById('user-ip');
-        const keyContainer = document.getElementById('user-key');
-
-        const ip = await getPublicIp();
-
-        if (!ip) {
-            ipContainer.innerText = "Lỗi kết nối";
-            keyContainer.innerText = "KHÔNG THỂ XÁC THỰC";
+        if (sessionKey) {
+            document.getElementById("keyText").innerText = sessionKey;
+            document.getElementById("btnCopy").disabled = false;
             return;
         }
 
-        // Tìm vị trí index từ 0 - 999 tương ứng với IP
-        const keyIndex = ipToIndex(ip);
+        // Tải nội dung file txt từ github
+        let response = await fetch(TXT_URL);
+        let textData = await response.text();
         
-        // Trích xuất đúng 1 key duy nhất từ mảng 1000 key
-        const finalKey = MASTER_KEYS[keyIndex];
-
-        // Hiển thị giao diện
-        ipContainer.innerText = ip;
-        keyContainer.innerText = finalKey;
-
-        // Xóa sạch lịch sử console trước khi ghi log
-        console.clear();
-
-        // Chỉ log đúng thông tin của IP truy cập hiện tại
-        console.log(`[Hệ Thống] Đồng bộ IP thành công.`);
-        console.log(`[IP]: ${ip}`);
-        console.log(`[Key Assigned]: ${finalKey}`);
+        // Tách chuỗi dữ liệu thành mảng theo từng dòng
+        let keysArray = textData.split("\n").map(k => k.trim()).filter(k => k.length > 0);
+        
+        if (keysArray.length > 0) {
+            // Chọn ngẫu nhiên 1 key trong danh sách 200 key
+            let randomIndex = Math.floor(Math.random() * keysArray.length);
+            let selectedKey = keysArray[randomIndex];
+            
+            // Lưu vào bộ nhớ tạm của trình duyệt
+            sessionStorage.setItem("user_key", selectedKey);
+            
+            document.getElementById("keyText").innerText = selectedKey;
+            document.getElementById("btnCopy").disabled = false;
+        } else {
+            document.getElementById("keyText").innerText = "HẾT KEY TRÊN HỆ THỐNG";
+        }
+    } catch (error) {
+        document.getElementById("keyText").innerText = "LỖI KẾT NỐI SERVER";
     }
+}
 
-    window.onload = main;
-})();
+loadRandomKey();
+
+function copyKey() {
+    var keyText = document.getElementById("keyText").innerText;
+    navigator.clipboard.writeText(keyText).then(function() {
+        alert("✅ Đã sao chép Key thành công!");
+    });
+}
 </script>
 
 </body>
