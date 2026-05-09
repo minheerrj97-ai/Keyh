@@ -3,80 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Lấy Key Tool</title>
-    <link href="jsdelivr.net" rel="stylesheet">
+    <title>Hệ Thống 1000 Key Cố Định</title>
     <style>
-        body { background-color: #f4f6f9; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .key-card { max-width: 500px; width: 100%; border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }
-        .key-display { background-color: #e9ecef; border: 2px dashed #0d6efd; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 1.2rem; letter-spacing: 1px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; }
+        h2 { color: #1a73e8; margin-bottom: 15px; }
+        p { color: #5f6368; font-size: 16px; margin: 8px 0; }
+        .bold { font-weight: bold; color: #202124; }
+        .key-box { margin-top: 20px; padding: 15px; background: #e8f0fe; border: 2px solid #1a73e8; border-radius: 8px; font-size: 24px; font-weight: bold; color: #1967d2; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-<div class="container d-flex justify-content-center">
-    <div class="card key-card p-4 text-center bg-white">
-        <h3 class="text-primary mb-3">🎉 Vượt Link Thành Công!</h3>
-        <p class="text-muted">Chúc mừng bạn đã hoàn thành nhiệm vụ. Dưới đây là Key kích hoạt Tool của bạn:</p>
-        
-        <div id="keyBox" class="key-display p-3 rounded mb-4 text-break">Đang tạo Key...</div>
-
-        <div class="d-grid gap-2">
-            <button id="btnCopy" class="btn btn-outline-secondary btn-lg" onclick="copyKey()">📋 Sao Chép Key</button>
-            <a id="btnTelegram" href="#" class="btn btn-primary btn-lg disabled" target="_blank">🚀 Mở Telegram Kích Hoạt Tool</a>
-        </div>
-        <p class="text-danger mt-3 small">* Vui lòng không chia sẻ Key này cho người khác.</p>
-    </div>
+<div class="card">
+    <h2>Xác Thực Hệ Thống</h2>
+    <p>IP của bạn: <span id="user-ip" class="bold">Đang quét...</span></p>
+    <p>Key kích hoạt duy nhất:</p>
+    <div id="user-key" class="key-box">Đang đồng bộ...</div>
 </div>
 
 <script>
-    // 1. ĐIỀN USERNAME BOT TELEGRAM CỦA BẠN VÀO ĐÂY (Không chứa dấu @)
-    const TELEGRAM_BOT_USERNAME = "Bot837474_bot";
+(() => {
+    // Hàm tự động tạo danh sách 1000 key riêng biệt, bảo mật (Format: KEY-XXXX-MÃ_HÓA)
+    function generateMasterKeyList() {
+        const list = [];
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Loại bỏ O, 0, I, 1 để tránh nhầm lẫn
+        
+        for (let i = 1; i <= 1000; i++) {
+            // Tạo chuỗi 6 ký tự ngẫu nhiên cố định dựa trên số thứ tự i để tạo độ phức tạp
+            let pseudoRandomStr = "";
+            let num = i * 1234567;
+            for (let j = 0; j < 6; j++) {
+                num = (num * 1103515245 + 12345) & 0x7fffffff;
+                pseudoRandomStr += chars[num % chars.length];
+            }
+            
+            const keyNumber = String(i).padStart(4, '0');
+            list.push(`KEY-${keyNumber}-${pseudoRandomStr}`);
+        }
+        return list;
+    }
 
-    // 2. DÁN 1000 KEY CỦA BẠN VÀO TRONG MẢNG NÀY
-    const DANH_SACH_1000_KEY = [
-        "HaiCoding_Key22_EZ2S",
-        "Key_Tool_9999_AX12",
-        "Key_Tool_8888_BY34",
-        "Key_Tool_7777_CZ56"
-        // ... Dán tiếp các key còn lại vào đây, cách nhau bằng dấu phẩy
-    ];
+    // Khởi tạo danh sách 1000 key cố định ngay khi chạy trang
+    const MASTER_KEYS = generateMasterKeyList();
 
-    window.onload = function() {
-        const keyBox = document.getElementById('keyBox');
-        const btnTelegram = document.getElementById('btnTelegram');
-
-        // Hệ thống tự động bốc ngẫu nhiên 1 Key từ danh sách 1000 key ở trên
-        if (DANH_SACH_1000_KEY.length > 0) {
-            const randomIndex = Math.floor(Math.random() * DANH_SACH_1000_KEY.length);
-            const selectedKey = DANH_SACH_1000_KEY[randomIndex];
-
-            // Hiển thị Key ra màn hình
-            keyBox.innerText = selectedKey;
-
-            // Gắn Key vào link chuyển hướng t.me/bot?start=KEY
-            btnTelegram.href = `t.me{TELEGRAM_BOT_USERNAME}?start=${encodeURIComponent(selectedKey)}`;
-            btnTelegram.classList.remove('disabled');
-        } else {
-            keyBox.innerText = "❌ Hệ thống chưa cấu hình danh sách Key!";
-            keyBox.style.color = "red";
-            keyBox.style.borderColor = "red";
+    // Hàm lấy IP công khai của người dùng
+    async function getPublicIp() {
+        try {
+            const res = await fetch('ipify.org');
+            const data = await res.json();
+            return data.ip;
+        } catch {
+            try {
+                const resBackup = await fetch('ipinfo.io');
+                const dataBackup = await resBackup.json();
+                return dataBackup.ip;
+            } catch {
+                return null;
+            }
         }
     }
 
-    function copyKey() {
-        const keyText = document.getElementById('keyBox').innerText;
-        if(keyText && !keyText.includes("❌") && keyText !== "Đang tạo Key...") {
-            navigator.clipboard.writeText(keyText).then(() => {
-                const btnCopy = document.getElementById('btnCopy');
-                btnCopy.innerText = "✅ Đã Sao Chép!";
-                btnCopy.className = "btn btn-success btn-lg";
-                setTimeout(() => {
-                    btnCopy.innerText = "📋 Sao Chép Key";
-                    btnCopy.className = "btn btn-outline-secondary btn-lg";
-                }, 2000);
-            });
+    // Hàm chuyển đổi IP thành số nguyên cố định từ 0 đến 999
+    function ipToIndex(ip) {
+        let hash = 0;
+        // Chuỗi mã muối giúp phân bổ đều các dải IP
+        const salt = "SECURE_SYSTEM_2026"; 
+        const targetStr = ip + salt;
+        
+        for (let i = 0; i < targetStr.length; i++) {
+            hash = (hash << 5) - hash + targetStr.charCodeAt(i);
+            hash |= 0;
         }
+        return Math.abs(hash) % 1000;
     }
+
+    // Hàm chạy chính
+    async function main() {
+        const ipContainer = document.getElementById('user-ip');
+        const keyContainer = document.getElementById('user-key');
+
+        const ip = await getPublicIp();
+
+        if (!ip) {
+            ipContainer.innerText = "Lỗi kết nối";
+            keyContainer.innerText = "KHÔNG THỂ XÁC THỰC";
+            return;
+        }
+
+        // Tìm vị trí index từ 0 - 999 tương ứng với IP
+        const keyIndex = ipToIndex(ip);
+        
+        // Trích xuất đúng 1 key duy nhất từ mảng 1000 key
+        const finalKey = MASTER_KEYS[keyIndex];
+
+        // Hiển thị giao diện
+        ipContainer.innerText = ip;
+        keyContainer.innerText = finalKey;
+
+        // Xóa sạch lịch sử console trước khi ghi log
+        console.clear();
+
+        // Chỉ log đúng thông tin của IP truy cập hiện tại
+        console.log(`[Hệ Thống] Đồng bộ IP thành công.`);
+        console.log(`[IP]: ${ip}`);
+        console.log(`[Key Assigned]: ${finalKey}`);
+    }
+
+    window.onload = main;
+})();
 </script>
+
 </body>
 </html>
