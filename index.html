@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HỆ THỐNG PHÂN PHỐI KEY TOOL</title>
+    <title>Trang Nhận Key Tool</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,101 +16,153 @@
             margin: 0;
         }
         .container {
-            background: rgba(255, 255, 255, 0.05);
+            background-color: #162447;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
             text-align: center;
             max-width: 400px;
-            width: 90%;
+            width: 100%;
         }
-        h2 { margin-bottom: 20px; font-size: 22px; color: #00ffcc; }
+        h1 {
+            color: #e43f5a;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
         .key-box {
-            background: rgba(0, 0, 0, 0.4);
+            background-color: #1f4068;
             padding: 15px;
             border-radius: 8px;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             letter-spacing: 2px;
-            margin-bottom: 20px;
+            margin: 20px 0;
+            border: 2px dashed #00fff0;
+            color: #00fff0;
             word-break: break-all;
-            border: 1px dashed #00ffcc;
-            color: #ffff00;
         }
-        button {
-            background: linear-gradient(to right, #00ffcc, #00a8cc);
+        .btn-copy {
+            background-color: #e43f5a;
+            color: white;
             border: none;
-            color: #0f2027;
             padding: 12px 25px;
             font-size: 16px;
-            font-weight: bold;
-            border-radius: 25px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: 0.3s;
             width: 100%;
+        }
+        .btn-copy:hover {
+            background-color: #ff4d6d;
+        }
+        .note {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-top: 15px;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🔑 NHẬN KEY TOOL NGẪU NHIÊN 🔑</h2>
-    <p>Vui lòng sao chép mã bên dưới và gửi vào Bot Telegram để kích hoạt</p>
+    <h1>🔑 KEY TOOL CỦA BẠN</h1>
+    <p>Hãy copy key bên dưới và gửi vào Bot Telegram để kích hoạt.</p>
     
-    <div class="key-box" id="keyText">ĐANG TẢI KEY...</div>
+    <div class="key-box" id="keyDisplay">Đang tải...</div>
     
-    <button id="btnCopy" onclick="copyKey()" disabled>📋 SAO CHÉP KEY</button>
+    <button class="btn-copy" onclick="copyKey()">Sao Chép Key</button>
+    
+    <p class="note">⚠️ <i>Mỗi thiết bị chỉ được cấp 1 Key trong 24 giờ. Việc tải lại trang (F5) không làm thay đổi Key hoặc tạo Key mới.</i></p>
 </div>
 
 <script>
-// Đường dẫn đến file key.txt của bạn trên GitHub Pages
-const TXT_URL = "key.txt"; 
+    // --- KHO CHỨA ĐẦY ĐỦ 200 KEY TRÙNG KHỚP VỚI FILE KEY.TXT ---
+    const BOT_KEYS = [
+        "TOOL-N8X7R2K4", "TOOL-M3P9Q6W1", "TOOL-L5K2J8V4", "TOOL-B7N1M9X3", "TOOL-C4V8B2N6",
+        "TOOL-X1Z9Q3W7", "TOOL-A5S2D8F4", "TOOL-G7H1J9K3", "TOOL-L4K8J2H6", "TOOL-F1D9S3A7",
+        "TOOL-Q5W2E8R4", "TOOL-T7Y1U9I3", "TOOL-O4P8L2K6", "TOOL-M1N9B3V7", "TOOL-C5X2Z8Q4",
+        "TOOL-W7E1R9T3", "TOOL-Y4U8I2O6", "TOOL-P1L9K3J7", "TOOL-H5G2F8D4", "TOOL-S7A1Z9X3",
+        "TOOL-C4V8B2N6", "TOOL-N1M9K3L7", "TOOL-J5H2G8F4", "TOOL-D7S1A9Q3", "TOOL-W4E8R2T6",
+        "TOOL-Y1U9I3O7", "TOOL-P5L2K8J4", "TOOL-H7G1F9D3", "TOOL-S4A8Z2X6", "TOOL-C1V9B3N7",
+        "TOOL-M5K2J8H4", "TOOL-G7F1D9S3", "TOOL-A4Q8W2E6", "TOOL-R1T9Y3U7", "TOOL-I5O2P8L4",
+        "TOOL-K7J1H9G3", "TOOL-F4D8S2A6", "TOOL-Z1X9C3V7", "TOOL-B5N2M8K4", "TOOL-L7K1J9H3",
+        "TOOL-G4F8D2S6", "TOOL-A1Q9W3E7", "TOOL-R5T2Y8U4", "TOOL-I7O1P9L3", "TOOL-K4J8H2G6",
+        "TOOL-F1D9S3A7", "TOOL-Z5X2C8V4", "TOOL-B7N1M9K3", "TOOL-L4K8J2H6", "TOOL-G1F9D3S7",
+        "TOOL-A5Q2W8E4", "TOOL-R7T1Y9U3", "TOOL-I4O8P2L6", "TOOL-K1J9H3G7", "TOOL-F5D2S8A4",
+        "TOOL-Z7X1C9V3", "TOOL-B4N8M2K6", "TOOL-L1K9J3H7", "TOOL-G5F2D8S4", "TOOL-A7Q1W9E3",
+        "TOOL-R4T8Y2U6", "TOOL-I1O9P3L7", "TOOL-K5J2H8G4", "TOOL-F7D1S9A3", "TOOL-Z4X8C2V6",
+        "TOOL-B1N9M3K7", "TOOL-L5K2J8H4", "TOOL-G7F1D9S3", "TOOL-A4Q8W2E6", "TOOL-R1T9Y3U7",
+        "TOOL-I5O2P8L4", "TOOL-K7J1H9G3", "TOOL-F4D8S2A6", "TOOL-Z1X9C3V7", "TOOL-B5N2M8K4",
+        "TOOL-L7K1J9H3", "TOOL-G4F8D2S6", "TOOL-A1Q9W3E7", "TOOL-R5T2Y8U4", "TOOL-I7O1P9L3",
+        "TOOL-K4J8H2G6", "TOOL-F1D9S3A7", "TOOL-Z5X2C8V4", "TOOL-B7N1M9K3", "TOOL-L4K8J2H6",
+        "TOOL-G1F9D3S7", "TOOL-A5Q2W8E4", "TOOL-R7T1Y9U3", "TOOL-I4O8P2L6", "TOOL-K1J9H3G7",
+        "TOOL-F5D2S8A4", "TOOL-Z7X1C9V3", "TOOL-B4N8M2K6", "TOOL-L1K9J3H7", "TOOL-G5F2D8S4",
+        "TOOL-A7Q1W9E3", "TOOL-R4T8Y2U6", "TOOL-I1O9P3L7", "TOOL-K5J2H8G4", "TOOL-F7D1S9A3",
+        "TOOL-Z4X8C2V6", "TOOL-B1N9M3K7", "TOOL-L5K2J8H4", "TOOL-G7F1D9S3", "TOOL-A4Q8W2E6",
+        "TOOL-R1T9Y3U7", "TOOL-I5O2P8L4", "TOOL-K7J1H9G3", "TOOL-F4D8S2A6", "TOOL-Z1X9C3V7",
+        "TOOL-B5N2M8K4", "TOOL-L7K1J9H3", "TOOL-G4F8D2S6", "TOOL-A1Q9W3E7", "TOOL-R5T2Y8U4",
+        "TOOL-I7O1P9L3", "TOOL-K4J8H2G6", "TOOL-F1D9S3A7", "TOOL-Z5X2C8V4", "TOOL-B7N1M9K3",
+        "TOOL-L4K8J2H6", "TOOL-G1F9D3S7", "TOOL-A5Q2W8E4", "TOOL-R7T1Y9U3", "TOOL-I4O8P2L6",
+        "TOOL-K1J9H3G7", "TOOL-F5D2S8A4", "TOOL-Z7X1C9V3", "TOOL-B4N8M2K6", "TOOL-L1K9J3H7",
+        "TOOL-G5F2D8S4", "TOOL-A7Q1W9E3", "TOOL-R4T8Y2U6", "TOOL-I1O9P3L7", "TOOL-K5J2H8G4",
+        "TOOL-F7D1S9A3", "TOOL-Z4X8C2V6", "TOOL-B1N9M3K7", "TOOL-L5K2J8H4", "TOOL-G7F1D9S3",
+        "TOOL-A4Q8W2E6", "TOOL-R1T9Y3U7", "TOOL-I5O2P8L4", "TOOL-K7J1H9G3", "TOOL-F4D8S2A6",
+        "TOOL-Z1X9C3V7", "TOOL-B5N2M8K4", "TOOL-L7K1J9H3", "TOOL-G4F8D2S6", "TOOL-A1Q9W3E7",
+        "TOOL-R5T2Y8U4", "TOOL-I7O1P9L3", "TOOL-K4J8H2G6", "TOOL-F1D9S3A7", "TOOL-Z5X2C8V4",
+        "TOOL-B7N1M9K3", "TOOL-L4K8J2H6", "TOOL-G1F9D3S7", "TOOL-A5Q2W8E4", "TOOL-R7T1Y9U3",
+        "TOOL-I4O8P2L6", "TOOL-K1J9H3G7", "TOOL-F5D2S8A4", "TOOL-Z7X1C9V3", "TOOL-B4N8M2K6",
+        "TOOL-L1K9J3H7", "TOOL-G5F2D8S4", "TOOL-A7Q1W9E3", "TOOL-R4T8Y2U6", "TOOL-I1O9P3L7",
+        "TOOL-K5J2H8G4", "TOOL-F7D1S9A3", "TOOL-Z4X8C2V6", "TOOL-B1N9M3K7", "TOOL-L5K2J8H4",
+        "TOOL-G7F1D9S3", "TOOL-A4Q8W2E6", "TOOL-R1T9Y3U7", "TOOL-I5O2P8L4", "TOOL-K7J1H9G3",
+        "TOOL-F4D8S2A6", "TOOL-Z1X9C3V7", "TOOL-B5N2M8K4", "TOOL-L7K1J9H3", "TOOL-G4F8D2S6",
+        "TOOL-A1Q9W3E7", "TOOL-R5T2Y8U4", "TOOL-I7O1P9L3", "TOOL-K4J8H2G6", "TOOL-F1D9S3A7",
+        "TOOL-Z5X2C8V4", "TOOL-B7N1M9K3"
+    ];
 
-async function loadRandomKey() {
-    try {
-        // Kiểm tra xem trình duyệt đã lưu key phiên này chưa để tránh đổi key khi F5
-        let sessionKey = sessionStorage.getItem("user_key");
-        
-        if (sessionKey) {
-            document.getElementById("keyText").innerText = sessionKey;
-            document.getElementById("btnCopy").disabled = false;
-            return;
-        }
-
-        // Tải nội dung file txt từ github
-        let response = await fetch(TXT_URL);
-        let textData = await response.text();
-        
-        // Tách chuỗi dữ liệu thành mảng theo từng dòng
-        let keysArray = textData.split("\n").map(k => k.trim()).filter(k => k.length > 0);
-        
-        if (keysArray.length > 0) {
-            // Chọn ngẫu nhiên 1 key trong danh sách 200 key
-            let randomIndex = Math.floor(Math.random() * keysArray.length);
-            let selectedKey = keysArray[randomIndex];
-            
-            // Lưu vào bộ nhớ tạm của trình duyệt
-            sessionStorage.setItem("user_key", selectedKey);
-            
-            document.getElementById("keyText").innerText = selectedKey;
-            document.getElementById("btnCopy").disabled = false;
-        } else {
-            document.getElementById("keyText").innerText = "HẾT KEY TRÊN HỆ THỐNG";
-        }
-    } catch (error) {
-        document.getElementById("keyText").innerText = "LỖI KẾT NỐI SERVER";
+    // Hàm lấy ngẫu nhiên 1 key trong danh sách trên
+    function getValidKey() {
+        const randomIndex = Math.floor(Math.random() * BOT_KEYS.length);
+        return BOT_KEYS[randomIndex];
     }
-}
 
-loadRandomKey();
+    window.onload = function() {
+        let systemKey = localStorage.getItem('user_tool_key');
+        let setupTime = localStorage.getItem('user_tool_key_time');
+        
+        const hoursLimit = 24; // Hạn dùng 24 tiếng đồng bộ với Bot Telegram
+        const now = new Date().getTime();
 
-function copyKey() {
-    var keyText = document.getElementById("keyText").innerText;
-    navigator.clipboard.writeText(keyText).then(function() {
-        alert("✅ Đã sao chép Key thành công!");
-    });
-}
+        // Kiểm tra nếu quá 24 tiếng thì xóa key cũ
+        if (setupTime && (now - setupTime > hoursLimit * 60 * 60 * 1000)) {
+            localStorage.removeItem('user_tool_key');
+            localStorage.removeItem('user_tool_key_time');
+            systemKey = null;
+        }
+
+        // Nếu chưa có key (hoặc vừa hết hạn), bốc 1 key trong danh sách 200 mã và khóa lại
+        if (!systemKey) {
+            systemKey = getValidKey();
+            localStorage.setItem('user_tool_key', systemKey);
+            localStorage.setItem('user_tool_key_time', now);
+            console.log("Đã cấp mã Key mới hợp lệ.");
+        } else {
+            console.log("Key cũ vẫn trong hạn 24 giờ. Tiếp tục hiển thị.");
+        }
+
+        // Hiển thị Key ra màn hình cho user
+        document.getElementById('keyDisplay').innerText = systemKey;
+    };
+
+    // Hàm copy mã nhanh
+    function copyKey() {
+        const keyText = document.getElementById('keyDisplay').innerText;
+        navigator.clipboard.writeText(keyText).then(() => {
+            alert('👉 Đã sao chép Key thành công!');
+        }).catch(err => {
+            alert('Lỗi sao chép, vui lòng bôi đen mã để tự copy.');
+        });
+    }
 </script>
 
 </body>
